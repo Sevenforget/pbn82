@@ -1,7 +1,6 @@
 "use client";
 
 import { fetchPostFromApi } from "@/lib/api-service";
-import { getCurrentProjectDomain } from "@/lib/domain-mapper";
 import type { Post } from "@/lib/types";
 import { ArrowLeft, Calendar, Tag, User } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -25,7 +24,7 @@ export default function PostPage() {
         setError(null);
 
         // 현재 프로젝트의 도메인 가져오기
-        const communityUrl = "https://cityvertical.com"; // 하드코딩된 도메인 (pbn-domains.json 기반)
+        const communityUrl = "https://armyrangergame.com"; // 하드코딩된 도메인 (pbn-domains.json 기반)
 
         // slug를 그대로 id로 사용
         const id = Number.parseInt(slug);
