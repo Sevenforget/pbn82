@@ -1,0 +1,132 @@
+"use client";
+
+import { fetchPostFromApi } from "@/lib/api-service";
+import { getCurrentProjectDomain } from "@/lib/domain-mapper";
+import type { Post } from "@/lib/types";
+import { ArrowLeft, Calendar, Tag, User } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+export default function PostPage() {
+  const params = useParams();
+  const router = useRouter();
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPost = async () => {
+      if (!slug) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 현재 프로젝트의 도메인 가져오기
+        const communityUrl = "https://cityvertical.com"; // 하드코딩된 도메인 (pbn-domains.json 기반)
+
+        // slug를 그대로 id로 사용
+        const id = Number.parseInt(slug);
+
+        // API에서 게시물 데이터 가져오기
+        const postData = await fetchPostFromApi(communityUrl, id);
+        setPost(postData);
+      } catch (err) {
+        console.error("게시물 로드 실패:", err);
+        setError("게시물을 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPost();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-700 mb-4 mx-auto"></div>
+          <p>게시물을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">
+            {error || "포스트를 찾을 수 없습니다"}
+          </h1>
+          <button
+            onClick={() => router.push("/")}
+            className="px-4 py-2 bg-slate-700 text-white rounded-md flex items-center gap-2 mx-auto"
+          >
+            <ArrowLeft size={16} />
+            메인으로 돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-3xl mx-auto p-6">
+        <button
+          onClick={() => router.push("/")}
+          className="mb-6 px-3 py-1 text-sm bg-slate-200 rounded-md flex items-center gap-1"
+        >
+          <ArrowLeft size={16} />
+          목록으로
+        </button>
+
+        <article className="glass-effect rounded-xl p-6">
+          <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
+
+          <div className="flex flex-wrap gap-4 text-sm text-slate-600 mb-6">
+            <div className="flex items-center gap-1">
+              <User size={14} />
+              <span>{post.author || "관리자"}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Calendar size={14} />
+              <span>
+                {new Date(post.date).toLocaleDateString("ko-KR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+          </div>
+
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-1 bg-slate-100 text-xs rounded-full flex items-center gap-1"
+                >
+                  <Tag size={12} />
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="prose max-w-none">
+            <p
+              className="whitespace-pre-line"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            ></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  );
+}
