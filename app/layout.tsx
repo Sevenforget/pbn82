@@ -1,23 +1,28 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import Sidebar from "@/components/sidebar"
+import type React from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import Sidebar from "@/components/sidebar";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CodeCanvas",
   description: "기술과 개발에 관한 개인 블로그",
-    generator: 'v0.dev'
-}
+  generator: "v0.dev",
+  verification: {
+    other: {
+      "naver-site-verification": "a2306ef355c957ce39f25e87cd4e501dde6c7bff",
+    },
+  },
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="ko">
@@ -30,5 +35,5 @@ export default function RootLayout({
         <Footer />
       </body>
     </html>
-  )
+  );
 }
